@@ -8,8 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --primary-pink: #FF85A1; /* Hồng đậm cho chữ và nút */
-            --soft-pink: #FFC2D1;    /* Hồng nhạt cho highlight */
+            --primary-pink: #FF85A1;
+            --soft-pink: #FFC2D1;
             --bg-overlay: rgba(255, 255, 255, 0.92);
             --correct-color: #2ECC71;
             --wrong-color: #E74C3C;
@@ -24,7 +24,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Background image */
             background: url('https://cdn.wallpapersafari.com/26/19/M26bXs.jpeg') no-repeat center center fixed;
             background-size: cover;
             color: var(--dark-text);
@@ -46,11 +45,7 @@
             border: 4px solid var(--soft-pink);
         }
 
-        h1, h3 {
-            color: var(--primary-pink);
-            font-weight: 700;
-            text-shadow: 1px 1px 0px rgba(255,255,255,1);
-        }
+        h1, h3 { color: var(--primary-pink); font-weight: 700; }
 
         .timer-badge {
             position: absolute;
@@ -61,25 +56,12 @@
             padding: 6px 18px;
             border-radius: 25px;
             font-weight: 700;
-            box-shadow: 0 4px 10px rgba(255, 133, 161, 0.3);
         }
 
         .progress-container { margin-bottom: 25px; text-align: right; }
-        .progress-bar { 
-            height: 12px; 
-            background: #f0f0f0; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            border: 1px solid var(--soft-pink);
-        }
-        #progress-fill { 
-            height: 100%; 
-            background: linear-gradient(90deg, var(--soft-pink), var(--primary-pink)); 
-            width: 0%; 
-            transition: width 0.5s ease; 
-        }
+        .progress-bar { height: 12px; background: #f0f0f0; border-radius: 10px; overflow: hidden; border: 1px solid var(--soft-pink); }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--soft-pink), var(--primary-pink)); width: 0%; transition: width 0.5s ease; }
 
-        /* Question Styles */
         .option-item {
             padding: 15px;
             background: white;
@@ -90,37 +72,27 @@
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 1.1rem;
-            color: var(--dark-text);
+            height: 55px; /* Giữ độ cao cố định để ngang hàng */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .option-item:hover {
-            background: #fff0f3;
-            transform: translateY(-2px);
-        }
-        
-        /* Feedback Classes */
-        .correct-card { 
-            border-color: var(--correct-color) !important; 
-            background-color: #e8faf0 !important; 
-            color: var(--correct-color) !important;
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
-        }
-        .wrong-card { 
-            border-color: var(--wrong-color) !important; 
-            background-color: #fdf2f2 !important; 
-            color: var(--wrong-color) !important;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
-        }
+
+        .correct-card { border-color: var(--correct-color) !important; background-color: #e8faf0 !important; color: var(--correct-color) !important; }
+        .wrong-card { border-color: var(--wrong-color) !important; background-color: #fdf2f2 !important; color: var(--wrong-color) !important; }
 
         .match-column { display: flex; flex-direction: column; gap: 12px; }
         .word-card {
-            padding: 12px 20px;
+            height: 55px; /* Giữ độ cao cố định để ngang hàng */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: white;
             border: 2px solid var(--primary-pink);
             border-radius: 15px;
             cursor: move;
             font-weight: 700;
             color: var(--primary-pink);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         button#next-btn, .start-btn {
@@ -130,28 +102,11 @@
             border-radius: 30px;
             color: white;
             font-weight: 700;
-            font-size: 1.1rem;
             cursor: pointer;
             margin-top: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 133, 161, 0.4);
-        }
-        button#next-btn:hover, .start-btn:hover {
-            background: #ff5c81;
-            transform: scale(1.05);
         }
 
-        input[type="text"] {
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px solid var(--soft-pink);
-            width: 70%;
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-            outline: none;
-            text-align: center;
-        }
-
+        input[type="text"] { padding: 15px; border-radius: 15px; border: 2px solid var(--soft-pink); width: 70%; margin-bottom: 20px; text-align: center; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -159,14 +114,11 @@
 
 <div id="app">
     <div id="timer" class="timer-badge hidden">00s</div>
-    
     <div id="welcome-slide">
         <h1>Learn with Ms. Thúy</h1>
-        <h3 style="color: var(--dark-text); margin-top: -10px;">Bedroom & Bathroom Quiz</h3>
-        <p style="font-weight: 500;">Hãy nhập tên của em để bắt đầu thử thách nhé!</p>
+        <h3>Bedroom & Bathroom Quiz</h3>
         <input type="text" id="user-name" placeholder="Tên của em là...">
-        <br>
-        <button class="start-btn" onclick="startQuiz()">Bắt đầu ngay</button>
+        <br><button class="start-btn" onclick="startQuiz()">Bắt đầu ngay</button>
     </div>
 
     <div id="quiz-container" class="hidden">
@@ -180,8 +132,7 @@
 
     <div id="result-slide" class="hidden">
         <h1 id="congrats-text"></h1>
-        <p style="font-size: 1.2rem; font-weight: 600;">Em đã hoàn thành xuất sắc bài ôn tập!</p>
-        <div style="font-size: 5rem; color: var(--primary-pink); font-weight: 800; margin: 20px 0;" id="score-display">0/30</div>
+        <div style="font-size: 5rem; color: var(--primary-pink); font-weight: 800;" id="score-display">0/30</div>
         <button class="start-btn" onclick="location.reload()">Làm lại bài</button>
     </div>
 </div>
@@ -194,9 +145,9 @@
     let score = 0;
     let timerInterval;
     let timeLeft = 0;
+    let sortableInstance;
 
     const questions = [
-        // P1: Multiple Choice
         { type: 'choice', q: "What do you wear to sleep?", options: ["Pyjamas", "Towel", "Shower gel", "Razor"], correct: "Pyjamas", time: 20 },
         { type: 'choice', q: "What wakes you up in the morning?", options: ["Mirror", "Alarm clock", "Basin", "Shelf"], correct: "Alarm clock", time: 20 },
         { type: 'choice', q: "Where do you hang your clothes?", options: ["Bed", "Wardrobe", "Toilet", "Dressing table"], correct: "Wardrobe", time: 20 },
@@ -207,8 +158,6 @@
         { type: 'choice', q: "I wash my hands in the ____.", options: ["Wardrobe", "Basin", "Bed", "Chest of drawers"], correct: "Basin", time: 20 },
         { type: 'choice', q: "A ____ is used to dry your body.", options: ["Mirror", "Towel", "Shelf", "Lamp"], correct: "Towel", time: 20 },
         { type: 'choice', q: "I use a ____ to shave.", options: ["Comb", "Razor", "Brush", "Soap"], correct: "Razor", time: 20 },
-
-        // P2: Matching
         { 
             type: 'matching', time: 120,
             pairs: [
@@ -219,8 +168,6 @@
                 {en: "Shower gel", vi: "Sữa tắm"}, {en: "Toothpaste", vi: "Kem đánh răng"}
             ] 
         },
-
-        // P3: Sentence Ordering
         { type: 'order', sentence: "Emma goes upstairs to her bedroom", words: ["Emma", "goes", "upstairs", "to", "her", "bedroom"], time: 40 },
         { type: 'order', sentence: "She gets undressed and gets into bed", words: ["She", "gets", "undressed", "and", "gets", "into", "bed"], time: 40 },
         { type: 'order', sentence: "She reads a book for a bit", words: ["She", "reads", "a", "book", "for", "a", "bit"], time: 40 },
@@ -283,37 +230,48 @@
             });
         } 
         else if (data.type === 'matching') {
-            area.innerHTML = `<h3 style="margin-bottom:20px;">Nối các từ vựng tương ứng (120s)</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:25px;"><div id="en-list" class="match-column"></div><div id="vi-list" class="match-column"></div></div>`;
+            area.innerHTML = `<h3 style="margin-bottom:20px;">Kéo các từ tiếng Anh ở cột trái để nối với nghĩa đúng</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:25px;"><div id="en-list" class="match-column"></div><div id="vi-list" class="match-column"></div></div>`;
             const sEn = [...data.pairs].sort(() => Math.random() - 0.5);
             const sVi = [...data.pairs].sort(() => Math.random() - 0.5);
-            sEn.forEach(p => document.getElementById('en-list').innerHTML += `<div class="word-card" data-id="${p.en}">${p.en}</div>`);
-            sVi.forEach(p => document.getElementById('vi-list').innerHTML += `<div class="option-item" style="cursor:default" data-target="${p.en}">${p.vi}</div>`);
-            new Sortable(document.getElementById('en-list'), { animation: 150 });
+            
+            sEn.forEach(p => document.getElementById('en-list').innerHTML += `<div class="word-card" data-en="${p.en}">${p.en}</div>`);
+            sVi.forEach(p => document.getElementById('vi-list').innerHTML += `<div class="option-item" style="cursor:default" data-en-ref="${p.en}">${p.vi}</div>`);
+            
+            sortableInstance = new Sortable(document.getElementById('en-list'), { animation: 150 });
             nextBtn.classList.remove('hidden');
             nextBtn.onclick = () => {
                 clearInterval(timerInterval);
+                sortableInstance.option("disabled", true); // Khóa kéo thả khi kiểm tra
+                
                 let mScore = 0;
-                const enItems = document.getElementById('en-list').querySelectorAll('.word-card');
-                const viItems = document.getElementById('vi-list').querySelectorAll('.option-item');
-                enItems.forEach((item, i) => {
-                    const isCorrect = item.dataset.id === viItems[i].dataset.target;
-                    if(isCorrect) mScore++;
-                    item.classList.add(isCorrect ? 'correct-card' : 'wrong-card');
-                    viItems[i].classList.add(isCorrect ? 'correct-card' : 'wrong-card');
+                const enCards = document.querySelectorAll('#en-list .word-card');
+                const viCards = document.querySelectorAll('#vi-list .option-item');
+
+                enCards.forEach((enCard, i) => {
+                    const viCard = viCards[i];
+                    if (enCard.dataset.en === viCard.dataset.enRef) {
+                        enCard.classList.add('correct-card');
+                        viCard.classList.add('correct-card');
+                        mScore++;
+                    } else {
+                        enCard.classList.add('wrong-card');
+                        viCard.classList.add('wrong-card');
+                    }
                 });
+
                 score += mScore;
-                document.getElementById(mScore > 5 ? 'sound-correct' : 'sound-wrong').play();
-                setTimeout(handleNext, 1800);
+                document.getElementById(mScore >= 5 ? 'sound-correct' : 'sound-wrong').play();
+                setTimeout(handleNext, 2500);
             };
         } 
         else if (data.type === 'order') {
             area.innerHTML = `<h3 style="margin-bottom:20px;">Kéo thả để sắp xếp câu đúng:</h3><div id="sort-area" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:25px; border:3px dashed var(--soft-pink); border-radius:20px; min-height:100px; background: white;"></div>`;
-            [...data.words].sort(() => Math.random() - 0.5).forEach(w => document.getElementById('sort-area').innerHTML += `<div class="word-card">${w}</div>`);
+            [...data.words].sort(() => Math.random() - 0.5).forEach(w => document.getElementById('sort-area').innerHTML += `<div class="word-card" style="padding:0 15px;">${w}</div>`);
             new Sortable(document.getElementById('sort-area'), { animation: 150 });
             nextBtn.classList.remove('hidden');
             nextBtn.onclick = () => {
                 clearInterval(timerInterval);
-                const result = Array.from(document.getElementById('sort-area').children).map(c => c.innerText).join(" ");
+                const result = Array.from(document.getElementById('sort-area').children).map(c => c.innerText.trim()).join(" ");
                 const isCorrect = (result === data.sentence);
                 if(isCorrect) score++;
                 const areaEl = document.getElementById('sort-area');
