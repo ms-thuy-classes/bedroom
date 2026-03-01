@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Vocabulary Quiz - Bedroom & Bathroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #E0C3FC 0%, #8EC5FC 100%);
+            --white: rgba(255, 255, 255, 0.9);
+            --text: #4A4A4A;
+            --success: #A8E6CF;
+            --error: #FFD3B6;
+        }
+
+        * { box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary-gradient);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        #app {
+            width: 90%;
+            max-width: 800px;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        /* UI Elements */
+        input[type="text"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            outline: none;
+            width: 80%;
+        }
+
+        button {
+            background: #8EC5FC;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover { transform: scale(1.05); }
+
+        .hidden { display: none !important; }
+
+        /* Quiz Styles */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #8EC5FC;
+            color: #8EC5FC;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        /* Matching Style */
+        .matching-container {
+            display: flex;
+            justify-content: space-around;
+            text-align: left;
+        }
+        .match-list { list-style: none; padding: 0; width: 45%; }
+        .match-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: grab;
+        }
+
+        /* Sentence Ordering */
+        #sortable-sentence {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .word-card {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: move;
+            border: 1px solid #ccc;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+        #progress-fill {
+            height: 100%;
+            background: #8EC5FC;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="welcome-slide">
+        <h1>Chào mừng bạn!</h1>
+        <p>Nhập tên của bạn để bắt đầu bài ôn tập</p>
+        <input type="text" id="user-name" placeholder="Tên của bạn...">
+        <br>
+        <button onclick="startQuiz()">Bắt đầu</button>
+    </div>
+
+    <div id="quiz-container" class="hidden">
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <div id="question-area"></div>
+        <button id="next-btn" class="hidden" onclick="handleNext()">Tiếp theo</button>
+    </div>
+
+    <div id="result-slide" class="hidden">
+        <h1 id="congrats-text"></h1>
+        <div style="font-size: 3rem; margin: 20px 0;" id="score-display">0/30</div>
+        <button onclick="location.reload()">Làm lại</button>
+    </div>
+</div>
+
+<audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+
+<script>
+    let userName = "";
+    let currentStep = 0;
+    let score = 0;
+    
+    // 30 Questions Data
+    const questions = [
+        // Part 1: Fill in the blank (10 questions)
+        { type: 'choice', q: "I use a ____ to wash my hair.", options: ["soap", "shampoo", "toothpaste", "razor"], correct: "shampoo" },
+        { type: 'choice', q: "The ____ tells me it's time to wake up.", options: ["mirror", "wardrobe", "alarm clock", "towel"], correct: "alarm clock" },
+        { type: 'choice', q: "You look at your reflection in the ____.", options: ["basin", "mirror", "shelf", "bed"], correct: "mirror" },
+        { type: 'choice', q: "I put my clothes in the ____.", options: ["wardrobe", "shower", "sink", "lamp"], correct: "wardrobe" },
+        { type: 'choice', q: "Before going to sleep, I put on my ____.", options: ["towels", "razors", "pyjamas", "soaps"], correct: "pyjamas" },
+        { type: 'choice', q: "I brush my teeth with a ____ and toothpaste.", options: ["hairbrush", "comb", "toothbrush", "razor"], correct: "toothbrush" },
+        { type: 'choice', q: "There is a ____ next to my bed to put my book on.", options: ["bedside table", "shower", "toilet", "bath"], correct: "bedside table" },
+        { type: 'choice', q: "I use a ____ to dry my body after a shower.", options: ["basin", "towel", "shelf", "soap"], correct: "towel" },
+        { type: 'choice', q: "The ____ has drawers for my socks.", options: ["chest of drawers", "mirror", "lamp", "curtain"], correct: "chest of drawers" },
+        { type: 'choice', q: "I wash my hands in the ____.", options: ["wardrobe", "basin", "bedside lamp", "pyjamas"], correct: "basin" },
+
+        // Part 2: Matching (1 Slide, but counted as 10 points)
+        { 
+            type: 'matching', 
+            pairs: [
+                {en: "Wardrobe", vi: "Tủ quần áo"}, {en: "Basin", vi: "Bồn rửa mặt"},
+                {en: "Razor", vi: "Dao cạo râu"}, {en: "Towel", vi: "Khăn tắm"},
+                {en: "Mirror", vi: "Cái gương"}, {en: "Comb", vi: "Cái lược"},
+                {en: "Soap", vi: "Xà phòng"}, {en: "Shower", vi: "Vòi hoa sen"},
+                {en: "Lamp", vi: "Đèn ngủ"}, {en: "Blanket", vi: "Cái chăn"}
+            ] 
+        },
+
+        // Part 3: Sentence Ordering (10 questions)
+        { type: 'order', sentence: "She goes upstairs to her bedroom", words: ["She", "goes", "upstairs", "to", "her", "bedroom"] },
+        { type: 'order', sentence: "She gets undressed and gets into bed", words: ["She", "gets", "undressed", "and", "gets", "into", "bed"] },
+        { type: 'order', sentence: "She reads a book for a bit", words: ["She", "reads", "a", "book", "for", "a", "bit"] },
+        { type: 'order', sentence: "Emma turns off the light", words: ["Emma", "turns", "off", "the", "light"] },
+        { type: 'order', sentence: "She falls asleep very quickly", words: ["She", "falls", "asleep", "very", "quickly"] },
+        { type: 'order', sentence: "The alarm clock rings at seven", words: ["The", "alarm", "clock", "rings", "at", "seven"] },
+        { type: 'order', sentence: "She wakes up and gets up", words: ["She", "wakes", "up", "and", "gets", "up"] },
+        { type: 'order', sentence: "Emma has a cold shower", words: ["Emma", "has", "a", "cold", "shower"] },
+        { type: 'order', sentence: "She cleans her teeth after breakfast", words: ["She", "cleans", "her", "teeth", "after", "breakfast"] },
+        { type: 'order', sentence: "She goes downstairs to the kitchen", words: ["She", "goes", "downstairs", "to", "the", "kitchen"] }
+    ];
+
+    function startQuiz() {
+        userName = document.getElementById('user-name').value || "Bạn";
+        document.getElementById('welcome-slide').classList.add('hidden');
+        document.getElementById('quiz-container').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function playSound(isCorrect) {
+        const sound = document.getElementById(isCorrect ? 'sound-correct' : 'sound-wrong');
+        sound.currentTime = 0;
+        sound.play();
+    }
+
+    function showQuestion() {
+        const area = document.getElementById('question-area');
+        const nextBtn = document.getElementById('next-btn');
+        const data = questions[currentStep];
+        nextBtn.classList.add('hidden');
+        area.innerHTML = "";
+
+        // Update progress
+        document.getElementById('progress-fill').style.width = `${(currentStep / questions.length) * 100}%`;
+
+        if (data.type === 'choice') {
+            area.innerHTML = `<h3>${data.q}</h3><div class="options-grid"></div>`;
+            const grid = area.querySelector('.options-grid');
+            data.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    const isCorrect = (opt === data.correct);
+                    if(isCorrect) score++;
+                    playSound(isCorrect);
+                    Array.from(grid.children).forEach(b => b.style.opacity = "0.5");
+                    btn.style.opacity = "1";
+                    btn.style.border = "2px solid #4A4A4A";
+                    nextBtn.classList.remove('hidden');
+                };
+                grid.appendChild(btn);
+            });
+        } 
+        else if (data.type === 'matching') {
+            area.innerHTML = `<h3>Kéo các từ tiếng Anh sang cột tiếng Việt tương ứng</h3>
+                <div class="matching-container">
+                    <div id="en-list" class="match-list"></div>
+                    <div id="vi-list" class="match-list"></div>
+                </div>`;
+            const enList = document.getElementById('en-list');
+            const viList = document.getElementById('vi-list');
+            
+            // Shuffle
+            const shuffledEn = [...data.pairs].sort(() => Math.random() - 0.5);
+            shuffledEn.forEach(p => {
+                enList.innerHTML += `<div class="match-item" data-id="${p.en}">${p.en}</div>`;
+                viList.innerHTML += `<div class="match-item" data-id="${p.en}" style="background:#f9f9f9">${p.vi}</div>`;
+            });
+
+            new Sortable(enList, { animation: 150 });
+            nextBtn.classList.remove('hidden');
+            // This part is simplified: user hits next, we calculate
+            nextBtn.onclick = () => {
+                const items = enList.querySelectorAll('.match-item');
+                const targets = viList.querySelectorAll('.match-item');
+                let matchScore = 0;
+                items.forEach((item, index) => {
+                    if(item.dataset.id === targets[index].dataset.id) matchScore++;
+                });
+                score += matchScore;
+                playSound(matchScore > 5);
+                handleNext();
+            };
+        }
+        else if (data.type === 'order') {
+            area.innerHTML = `<h3>Sắp xếp câu đúng:</h3><div id="sortable-sentence"></div>`;
+            const sortArea = document.getElementById('sortable-sentence');
+            const shuffledWords = [...data.words].sort(() => Math.random() - 0.5);
+            shuffledWords.forEach(w => {
+                sortArea.innerHTML += `<div class="word-card">${w}</div>`;
+            });
+            new Sortable(sortArea, { animation: 150 });
+            nextBtn.classList.remove('hidden');
+            nextBtn.onclick = () => {
+                const result = Array.from(sortArea.children).map(c => c.innerText).join(" ");
+                const isCorrect = (result === data.sentence);
+                if(isCorrect) score++;
+                playSound(isCorrect);
+                handleNext();
+            };
+        }
+    }
+
+    function handleNext() {
+        currentStep++;
+        if (currentStep < questions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-container').classList.add('hidden');
+        document.getElementById('result-slide').classList.remove('hidden');
+        document.getElementById('congrats-text').innerText = `Chúc mừng ${userName}!`;
+        document.getElementById('score-display').innerText = `${score}/30`;
+    }
+</script>
+</body>
+</html>
