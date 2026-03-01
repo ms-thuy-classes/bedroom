@@ -3,133 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Vocabulary Quiz - Bedroom & Bathroom</title>
+    <title>English Vocabulary Quiz - Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #E0C3FC 0%, #8EC5FC 100%);
-            --white: rgba(255, 255, 255, 0.9);
+            --white: rgba(255, 255, 255, 0.95);
             --text: #4A4A4A;
-            --success: #A8E6CF;
-            --error: #FFD3B6;
         }
 
         * { box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
 
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: var(--primary-gradient);
-            color: var(--text);
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: var(--primary-gradient); color: var(--text);
             overflow: hidden;
         }
 
         #app {
-            width: 90%;
-            max-width: 800px;
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: all 0.5s ease;
+            width: 95%; max-width: 800px; background: var(--white);
+            padding: 2rem; border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center; min-height: 550px;
+            display: flex; flex-direction: column; position: relative;
         }
 
-        /* UI Elements */
+        .progress-container { margin-bottom: 20px; text-align: right; }
+        .progress-text { font-size: 0.9rem; font-weight: 600; color: #888; margin-bottom: 5px; display: block; }
+        .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+        #progress-fill { height: 100%; background: #8EC5FC; width: 0%; transition: width 0.4s ease; }
+
         input[type="text"] {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            margin: 1rem 0;
-            outline: none;
-            width: 80%;
+            padding: 15px; border: 2px solid #eee; border-radius: 12px;
+            font-size: 1.1rem; width: 80%; outline: none; transition: border 0.3s;
         }
+        input[type="text"]:focus { border-color: #8EC5FC; }
 
         button {
-            background: #8EC5FC;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 20px;
+            background: #8EC5FC; border: none; padding: 12px 35px;
+            border-radius: 25px; color: white; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; margin-top: 20px;
         }
-
-        button:hover { transform: scale(1.05); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(142,197,252,0.4); }
 
         .hidden { display: none !important; }
 
-        /* Quiz Styles */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+        /* Matching Logic */
+        .matching-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            margin-top: 20px; padding: 10px;
         }
-
-        .option-btn {
-            background: white;
-            border: 2px solid #8EC5FC;
-            color: #8EC5FC;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        /* Matching Style */
-        .matching-container {
-            display: flex;
-            justify-content: space-around;
-            text-align: left;
-        }
-        .match-list { list-style: none; padding: 0; width: 45%; }
+        .match-column { display: flex; flex-direction: column; gap: 10px; }
         .match-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: grab;
+            padding: 12px; background: white; border: 1px solid #e0e0e0;
+            border-radius: 10px; cursor: grab; font-weight: 500;
+            transition: background 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
+        .match-item:active { cursor: grabbing; }
+        .static-item { background: #fdfdfd; cursor: default; }
 
-        /* Sentence Ordering */
-        #sortable-sentence {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin: 30px 0;
+        /* Word Cards for Ordering */
+        .sort-container {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            justify-content: center; margin: 40px 0; min-height: 60px;
         }
         .word-card {
-            padding: 10px 20px;
-            background: #f0f0f0;
-            border-radius: 8px;
-            cursor: move;
-            border: 1px solid #ccc;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #eee;
-            border-radius: 3px;
-            margin-bottom: 20px;
-        }
-        #progress-fill {
-            height: 100%;
-            background: #8EC5FC;
-            width: 0%;
-            transition: width 0.3s;
+            padding: 10px 20px; background: white; border: 2px solid #8EC5FC;
+            border-radius: 12px; cursor: move; font-weight: 600; color: #555;
         }
     </style>
 </head>
@@ -137,23 +79,27 @@
 
 <div id="app">
     <div id="welcome-slide">
-        <h1>Chào mừng bạn!</h1>
-        <p>Nhập tên của bạn để bắt đầu bài ôn tập</p>
-        <input type="text" id="user-name" placeholder="Tên của bạn...">
+        <h1>Hi! Sẵn sàng chưa?</h1>
+        <p>Nhập tên của bạn để bắt đầu thử thách</p>
+        <input type="text" id="user-name" placeholder="Tên bạn là gì nhỉ?">
         <br>
-        <button onclick="startQuiz()">Bắt đầu</button>
+        <button onclick="startQuiz()">Bắt đầu thôi!</button>
     </div>
 
     <div id="quiz-container" class="hidden">
-        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <div class="progress-container">
+            <span class="progress-text" id="progress-text">Câu 1 / 30</span>
+            <div class="progress-bar"><div id="progress-fill"></div></div>
+        </div>
         <div id="question-area"></div>
-        <button id="next-btn" class="hidden" onclick="handleNext()">Tiếp theo</button>
+        <button id="next-btn" class="hidden" onclick="handleNext()">Tiếp tục</button>
     </div>
 
     <div id="result-slide" class="hidden">
         <h1 id="congrats-text"></h1>
-        <div style="font-size: 3rem; margin: 20px 0;" id="score-display">0/30</div>
-        <button onclick="location.reload()">Làm lại</button>
+        <p>Kết quả của bạn là:</p>
+        <div style="font-size: 4rem; color: #8EC5FC; font-weight: 700;" id="score-display">0/30</div>
+        <button onclick="location.reload()">Làm lại bài tập</button>
     </div>
 </div>
 
@@ -164,39 +110,39 @@
     let userName = "";
     let currentStep = 0;
     let score = 0;
-    
-    // 30 Questions Data
+    const TOTAL_QUESTIONS = 30;
+
     const questions = [
-        // Part 1: Fill in the blank (10 questions)
+        // Phần 1: Điền từ (10 câu)
         { type: 'choice', q: "I use a ____ to wash my hair.", options: ["soap", "shampoo", "toothpaste", "razor"], correct: "shampoo" },
         { type: 'choice', q: "The ____ tells me it's time to wake up.", options: ["mirror", "wardrobe", "alarm clock", "towel"], correct: "alarm clock" },
-        { type: 'choice', q: "You look at your reflection in the ____.", options: ["basin", "mirror", "shelf", "bed"], correct: "mirror" },
-        { type: 'choice', q: "I put my clothes in the ____.", options: ["wardrobe", "shower", "sink", "lamp"], correct: "wardrobe" },
-        { type: 'choice', q: "Before going to sleep, I put on my ____.", options: ["towels", "razors", "pyjamas", "soaps"], correct: "pyjamas" },
-        { type: 'choice', q: "I brush my teeth with a ____ and toothpaste.", options: ["hairbrush", "comb", "toothbrush", "razor"], correct: "toothbrush" },
-        { type: 'choice', q: "There is a ____ next to my bed to put my book on.", options: ["bedside table", "shower", "toilet", "bath"], correct: "bedside table" },
-        { type: 'choice', q: "I use a ____ to dry my body after a shower.", options: ["basin", "towel", "shelf", "soap"], correct: "towel" },
-        { type: 'choice', q: "The ____ has drawers for my socks.", options: ["chest of drawers", "mirror", "lamp", "curtain"], correct: "chest of drawers" },
+        { type: 'choice', q: "I look at myself in the ____.", options: ["basin", "mirror", "shelf", "bed"], correct: "mirror" },
+        { type: 'choice', q: "I hang my clothes in the ____.", options: ["wardrobe", "shower", "sink", "lamp"], correct: "wardrobe" },
+        { type: 'choice', q: "I wear ____ to sleep at night.", options: ["towels", "razors", "pyjamas", "soaps"], correct: "pyjamas" },
+        { type: 'choice', q: "I brush my teeth with a ____.", options: ["hairbrush", "comb", "toothbrush", "razor"], correct: "toothbrush" },
+        { type: 'choice', q: "The ____ is next to the bed for my lamp.", options: ["bedside table", "shower", "toilet", "bath"], correct: "bedside table" },
+        { type: 'choice', q: "I use a ____ to dry myself after a bath.", options: ["basin", "towel", "shelf", "soap"], correct: "towel" },
+        { type: 'choice', q: "I keep my socks in the ____.", options: ["chest of drawers", "mirror", "lamp", "curtain"], correct: "chest of drawers" },
         { type: 'choice', q: "I wash my hands in the ____.", options: ["wardrobe", "basin", "bedside lamp", "pyjamas"], correct: "basin" },
 
-        // Part 2: Matching (1 Slide, but counted as 10 points)
+        // Phần 2: Nối từ (Tính 10 câu)
         { 
             type: 'matching', 
             pairs: [
-                {en: "Wardrobe", vi: "Tủ quần áo"}, {en: "Basin", vi: "Bồn rửa mặt"},
-                {en: "Razor", vi: "Dao cạo râu"}, {en: "Towel", vi: "Khăn tắm"},
-                {en: "Mirror", vi: "Cái gương"}, {en: "Comb", vi: "Cái lược"},
-                {en: "Soap", vi: "Xà phòng"}, {en: "Shower", vi: "Vòi hoa sen"},
-                {en: "Lamp", vi: "Đèn ngủ"}, {en: "Blanket", vi: "Cái chăn"}
+                {en: "Soap", vi: "Xà phòng"}, {en: "Razor", vi: "Dao cạo râu"},
+                {en: "Mirror", vi: "Cái gương"}, {en: "Blanket", vi: "Cái chăn"},
+                {en: "Lamp", vi: "Đèn ngủ"}, {en: "Towel", vi: "Khăn tắm"},
+                {en: "Wardrobe", vi: "Tủ quần áo"}, {en: "Shower", vi: "Vòi hoa sen"},
+                {en: "Basin", vi: "Bồn rửa mặt"}, {en: "Comb", vi: "Cái lược"}
             ] 
         },
 
-        // Part 3: Sentence Ordering (10 questions)
+        // Phần 3: Sắp xếp câu (10 câu)
         { type: 'order', sentence: "She goes upstairs to her bedroom", words: ["She", "goes", "upstairs", "to", "her", "bedroom"] },
         { type: 'order', sentence: "She gets undressed and gets into bed", words: ["She", "gets", "undressed", "and", "gets", "into", "bed"] },
         { type: 'order', sentence: "She reads a book for a bit", words: ["She", "reads", "a", "book", "for", "a", "bit"] },
         { type: 'order', sentence: "Emma turns off the light", words: ["Emma", "turns", "off", "the", "light"] },
-        { type: 'order', sentence: "She falls asleep very quickly", words: ["She", "falls", "asleep", "very", "quickly"] },
+        { type: 'order', sentence: "She falls asleep very quickly", words: ["She", "falls", "asleep", "very", "quick"] },
         { type: 'order', sentence: "The alarm clock rings at seven", words: ["The", "alarm", "clock", "rings", "at", "seven"] },
         { type: 'order', sentence: "She wakes up and gets up", words: ["She", "wakes", "up", "and", "gets", "up"] },
         { type: 'order', sentence: "Emma has a cold shower", words: ["Emma", "has", "a", "cold", "shower"] },
@@ -205,92 +151,98 @@
     ];
 
     function startQuiz() {
-        userName = document.getElementById('user-name').value || "Bạn";
+        userName = document.getElementById('user-name').value || "Người bạn bí ẩn";
         document.getElementById('welcome-slide').classList.add('hidden');
         document.getElementById('quiz-container').classList.remove('hidden');
         showQuestion();
-    }
-
-    function playSound(isCorrect) {
-        const sound = document.getElementById(isCorrect ? 'sound-correct' : 'sound-wrong');
-        sound.currentTime = 0;
-        sound.play();
     }
 
     function showQuestion() {
         const area = document.getElementById('question-area');
         const nextBtn = document.getElementById('next-btn');
         const data = questions[currentStep];
-        nextBtn.classList.add('hidden');
-        area.innerHTML = "";
+        
+        // Update Progress
+        // Vì phần Matching tính 10 câu nhưng chỉ là 1 bước, ta cần logic hiển thị số câu
+        let displayNum = currentStep < 11 ? currentStep + 1 : currentStep + 10;
+        if(currentStep === 10) displayNum = "11-20"; // Khi ở trang Matching
+        if(currentStep > 10) displayNum = currentStep + 10;
 
-        // Update progress
-        document.getElementById('progress-fill').style.width = `${(currentStep / questions.length) * 100}%`;
+        document.getElementById('progress-text').innerText = `Câu ${displayNum} / ${TOTAL_QUESTIONS}`;
+        document.getElementById('progress-fill').style.width = `${(displayNum / TOTAL_QUESTIONS) * 100}%`;
+
+        area.innerHTML = "";
+        nextBtn.classList.add('hidden');
 
         if (data.type === 'choice') {
-            area.innerHTML = `<h3>${data.q}</h3><div class="options-grid"></div>`;
-            const grid = area.querySelector('.options-grid');
+            area.innerHTML = `<h3>${data.q}</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;" id="choice-grid"></div>`;
             data.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn";
-                btn.innerText = opt;
-                btn.onclick = () => {
+                const b = document.createElement('div');
+                b.className = "match-item";
+                b.style.cursor = "pointer";
+                b.innerText = opt;
+                b.onclick = () => {
                     const isCorrect = (opt === data.correct);
                     if(isCorrect) score++;
-                    playSound(isCorrect);
-                    Array.from(grid.children).forEach(b => b.style.opacity = "0.5");
-                    btn.style.opacity = "1";
-                    btn.style.border = "2px solid #4A4A4A";
+                    document.getElementById('sound-' + (isCorrect?'correct':'wrong')).play();
                     nextBtn.classList.remove('hidden');
+                    Array.from(document.getElementById('choice-grid').children).forEach(el => {
+                        el.style.pointerEvents = "none";
+                        el.style.opacity = "0.6";
+                    });
+                    b.style.opacity = "1";
+                    b.style.borderColor = "#8EC5FC";
                 };
-                grid.appendChild(btn);
+                document.getElementById('choice-grid').appendChild(b);
             });
-        } 
+        }
         else if (data.type === 'matching') {
-            area.innerHTML = `<h3>Kéo các từ tiếng Anh sang cột tiếng Việt tương ứng</h3>
-                <div class="matching-container">
-                    <div id="en-list" class="match-list"></div>
-                    <div id="vi-list" class="match-list"></div>
+            area.innerHTML = `<h3>Kéo các từ tiếng Anh để nối với nghĩa đúng</h3>
+                <div class="matching-grid">
+                    <div id="en-list" class="match-column"></div>
+                    <div id="vi-list" class="match-column"></div>
                 </div>`;
             const enList = document.getElementById('en-list');
             const viList = document.getElementById('vi-list');
             
-            // Shuffle
+            // Xáo trộn cả 2 cột để không biết đáp án
             const shuffledEn = [...data.pairs].sort(() => Math.random() - 0.5);
+            const shuffledVi = [...data.pairs].sort(() => Math.random() - 0.5);
+
             shuffledEn.forEach(p => {
                 enList.innerHTML += `<div class="match-item" data-id="${p.en}">${p.en}</div>`;
-                viList.innerHTML += `<div class="match-item" data-id="${p.en}" style="background:#f9f9f9">${p.vi}</div>`;
+            });
+            shuffledVi.forEach(p => {
+                viList.innerHTML += `<div class="match-item static-item" data-target="${p.en}">${p.vi}</div>`;
             });
 
             new Sortable(enList, { animation: 150 });
             nextBtn.classList.remove('hidden');
-            // This part is simplified: user hits next, we calculate
             nextBtn.onclick = () => {
                 const items = enList.querySelectorAll('.match-item');
                 const targets = viList.querySelectorAll('.match-item');
                 let matchScore = 0;
-                items.forEach((item, index) => {
-                    if(item.dataset.id === targets[index].dataset.id) matchScore++;
+                items.forEach((item, i) => {
+                    if(item.dataset.id === targets[i].dataset.target) matchScore++;
                 });
                 score += matchScore;
-                playSound(matchScore > 5);
+                document.getElementById('sound-' + (matchScore > 5 ? 'correct' : 'wrong')).play();
                 handleNext();
             };
         }
         else if (data.type === 'order') {
-            area.innerHTML = `<h3>Sắp xếp câu đúng:</h3><div id="sortable-sentence"></div>`;
-            const sortArea = document.getElementById('sortable-sentence');
-            const shuffledWords = [...data.words].sort(() => Math.random() - 0.5);
-            shuffledWords.forEach(w => {
+            area.innerHTML = `<h3>Sắp xếp các từ thành câu đúng:</h3><div class="sort-container" id="sort-sentence"></div>`;
+            const sortArea = document.getElementById('sort-sentence');
+            [...data.words].sort(() => Math.random() - 0.5).forEach(w => {
                 sortArea.innerHTML += `<div class="word-card">${w}</div>`;
             });
             new Sortable(sortArea, { animation: 150 });
             nextBtn.classList.remove('hidden');
             nextBtn.onclick = () => {
-                const result = Array.from(sortArea.children).map(c => c.innerText).join(" ");
-                const isCorrect = (result === data.sentence);
+                const userSent = Array.from(sortArea.children).map(c => c.innerText).join(" ");
+                const isCorrect = (userSent === data.sentence);
                 if(isCorrect) score++;
-                playSound(isCorrect);
+                document.getElementById('sound-' + (isCorrect?'correct':'wrong')).play();
                 handleNext();
             };
         }
@@ -308,7 +260,7 @@
     function showResult() {
         document.getElementById('quiz-container').classList.add('hidden');
         document.getElementById('result-slide').classList.remove('hidden');
-        document.getElementById('congrats-text').innerText = `Chúc mừng ${userName}!`;
+        document.getElementById('congrats-text').innerText = `Tuyệt vời, ${userName}!`;
         document.getElementById('score-display').innerText = `${score}/30`;
     }
 </script>
